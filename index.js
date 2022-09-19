@@ -17,6 +17,15 @@ async function run (){
         await client.connect();
         console.log('db connected');
         const alumniCollection = client.db('alumniList').collection('alumnus');
+
+
+
+        app.get('/alumnus',async(req,res)=>{
+            const query = {};
+            const cursor = alumniCollection.find(query);
+            const alumnus = await cursor.toArray();
+            res.send(alumnus);
+        });
         
     }
     
