@@ -17,6 +17,7 @@ async function run (){
         await client.connect();
         console.log('db connected');
         const alumniCollection = client.db('alumniList').collection('alumnus');
+        const regCollection = client.db('regList').collection('regNumber');
 
 
 
@@ -25,6 +26,13 @@ async function run (){
             const cursor = alumniCollection.find(query);
             const alumnus = await cursor.toArray();
             res.send(alumnus);
+        });
+
+        app.get('/reg-number',async(req,res)=>{
+            const query = {};
+            const cursor = regCollection.find(query);
+            const regNumber = await cursor.toArray();
+            res.send(regNumber);
         });
         
     }
