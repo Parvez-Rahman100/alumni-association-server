@@ -15,9 +15,11 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         await client.connect();
+        console.log('DB Connected');
         const alumniCollection = client.db('alumniList').collection('alumnus');
         const regCollection = client.db('regList').collection('regNumber');
-        const jobCollection = client.db('joblist').collection('jobs')
+        const jobCollection = client.db('joblist').collection('jobs');
+        const photoCollection = client.db('photoList').collection('photos');
 
 
 
@@ -58,6 +60,23 @@ async function run() {
             const jobs = await cursor.toArray();
             res.send(jobs);
         });
+
+
+        app.post('/photos', async (req, res) => {
+            const photos = req.body;
+            const result = await photoCollection.insertOne(photos);
+            return res.send({ success: true, result })
+        });
+
+        app.get('/photos', async (req, res) => {
+            const query = {};
+            const cursor = photoCollection.find(query);
+            const photos = await cursor.toArray();
+            res.send(photos);
+        });
+
+
+
 
 
     }
