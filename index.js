@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const port = process.env.PORT || 8080;
@@ -20,7 +21,8 @@ async function run() {
         const regCollection = client.db('regList').collection('regNumber');
         const jobCollection = client.db('joblist').collection('jobs');
         const photoCollection = client.db('photoList').collection('photos');
-
+        const userCollection = client.db('userList').collection('users');
+        const infoCollection = client.db('infoList').collection('infos')
 
 
         app.get('/alumnus', async (req, res) => {
@@ -37,16 +39,7 @@ async function run() {
             res.send(regNumber);
         });
 
-        app.post('/register', async (req, res) => {
-            const query = req.body;
-            const cursor = await regCollection.find({}).toArray();
-            const result = cursor.find(al => +al.alumni_registration_number === +query.regNumber)
-            if (!result) {
-                return res.send(false)
-            }
-            res.send(true)
 
-        })
 
         app.post('/jobs', async (req, res) => {
             const jobs = req.body;
@@ -67,6 +60,47 @@ async function run() {
             const result = await photoCollection.insertOne(photos);
             return res.send({ success: true, result })
         });
+
+
+        app.post('/register', async (req, res) => {
+            const query = req.body;
+            const cursor = await regCollection.find({}).toArray();
+            const result = cursor.find(al => +al.alumni_registration_number === +query.regNumber)
+            if (!result) {
+                return res.send(false)
+            }
+            else {
+                res.send({ success: true, result })
+            }
+
+        })
+
+
+
+
+        app.post('/users', async (req, res) => {
+            const users = req.body;
+            const result = await userCollection.insertOne(users);
+            return res.send({ result })
+        });
+
+
+        app.post('/info', async (req, res) => {
+            const info = req.body;
+            const result = await infoCollection.insertOne(info);
+            return res.send({ result })
+        });
+
+        app.get('/info', async (req, res) => {
+            const info = await infoCollection.find().toArray()
+            res.send(info)
+        })
+
+
+        app.get('/users', async (req, res) => {
+            const users = await userCollection.find().toArray()
+            res.send(users)
+        })
 
         app.get('/photos', async (req, res) => {
             const query = {};
