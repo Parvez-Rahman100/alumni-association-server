@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 8080;
 const app = express();
 
@@ -31,6 +31,13 @@ async function run() {
             const alumnus = await cursor.toArray();
             res.send(alumnus);
         });
+
+        app.get('/alumnus/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const details = await alumniCollection.findOne(query);
+            res.send(details);
+        })
 
         app.get('/reg-number', async (req, res) => {
             const query = {};
@@ -83,6 +90,17 @@ async function run() {
             const result = await userCollection.insertOne(users);
             return res.send({ result })
         });
+
+
+        app.put('/users/admin/:email', async (req, res) => {
+            const email = req.params.email;
+            const filter = { email: email };
+            const updateDoc = {
+                $set: { role: 'admin' },
+            };
+            const result = await userCollection.updateOne(filter, updateDoc);
+            res.send(result)
+        })
 
 
         app.post('/info', async (req, res) => {
